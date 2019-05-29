@@ -1,3 +1,4 @@
+from django.urls import reverse
 from rest_framework import serializers
 from django.db import models
 from django.utils import timezone
@@ -47,6 +48,8 @@ class Post(models.Model):
 
 
 class PostSerializer(serializers.ModelSerializer):
+    urls = serializers.SerializerMethodField()
+
     def create(self, validated_data):
         creator = self.context['request'].user
         post = Post(
@@ -56,9 +59,18 @@ class PostSerializer(serializers.ModelSerializer):
         post.save()
         return post
 
+    def get_urls(self, instance):
+        request = self.context.get('request')
+        like_url = request.build_absolute_uri(reverse('post-like', kwargs={ 'pk':instance.pk }))
+        comment_url = request.build_absolute_uri(reverse('post-comment', kwargs={ 'pk':instance.pk }))
+        return {
+            'like': like_url,
+            'comment': comment_url
+        }
+
     class Meta:
         model = Post
-        fields = ('id', 'creator_info', 'caption', 'age_in_seconds', 'like_count')
+        fields = ('id', 'creator_info', 'caption', 'age_in_seconds', 'like_count', 'urls')
 
 
 class PostInteraction(models.Model):
