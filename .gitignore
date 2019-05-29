@@ -1,0 +1,101 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+db.sqlite3
+media/
+venv/
+static_test/
+phantom/output/
+node_modules/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Compiled React scripts
+.module-cache/
+_compiled_app/
+static/app/
+
+# Mac OS
+.DS_Store
+
+# Textmate IDE
+.tm_properties
+
+# Sublime Text
+christinas.sublime-project
+christinas.sublime-workspace
+
+# Misc
+pm2.json
+dump.rdb
+
+.env
+.vscode
+.idea
+
+# yarn
+package-lock.json
+
+# ssr
+render/server.bundle.js
+render/server.bundle.js.map
+render/server.bundle.css
+render/server.bundle.css.map
+render/css
+
+# shell notebook
+*.ipynb
+
+#capstone data
+capstone.json
+
+# Testing
+coverage
