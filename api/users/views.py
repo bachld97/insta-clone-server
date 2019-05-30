@@ -1,14 +1,18 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
+from . import oauth_client_info
 
 import requests
 
 from .serializers import CreateUserSerializer
 
+client_info = oauth_client_info.read_auth_info()
+CLIENT_ID = client_info['client_id']
+CLIENT_SECRET = client_info['client_secret']
 
-CLIENT_ID = '0kZYFquovqqNPLdMEKuaw4fUnZWkBiXiahSkDEdk'
-CLIENT_SECRET = 'iFsmJSqLyzbq2Apfh9vNj6m4knvwWnjiqoFEVPmkwMjuwIWjEz2jVZFf2QFipkvrmdYNxuLZJfBjF7liGmpKj30bANMClIBdaH0mvi78rfpPFUnehvFybUHMb7r2EMUA'
+# CLIENT_ID = '0kZYFquovqqNPLdMEKuaw4fUnZWkBiXiahSkDEdk'
+# CLIENT_SECRET = 'iFsmJSqLyzbq2Apfh9vNj6m4knvwWnjiqoFEVPmkwMjuwIWjEz2jVZFf2QFipkvrmdYNxuLZJfBjF7liGmpKj30bANMClIBdaH0mvi78rfpPFUnehvFybUHMb7r2EMUA'
 
 
 @api_view(['POST'])
