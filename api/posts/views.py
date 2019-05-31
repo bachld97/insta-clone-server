@@ -29,12 +29,6 @@ class PostViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def like(self, request, pk=None):
         like_object = PostInteraction.create_like(post_id=pk, user=request.user)
-        if like_object is None:
-            return Response(
-                { 'error' : 'Cannot create like for this post' },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
         return Response(
             { 'success': 'Like created' },
             status=status.HTTP_201_CREATED

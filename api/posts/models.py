@@ -54,6 +54,7 @@ class Post(models.Model):
 
 class PostSerializer(serializers.ModelSerializer):
     urls = serializers.SerializerMethodField()
+    liked_by_user = serializers.SerializerMethodField()
 
     def create(self, validated_data):
         creator = self.context['request'].user
@@ -63,6 +64,10 @@ class PostSerializer(serializers.ModelSerializer):
         )
         post.save()
         return post
+
+    def get_liked_by_user(self, instance):
+        uid = instance.creator.id
+        return PostInteraction.liked_by_user(user_id=uid)
 
     def get_urls(self, instance):
         request = self.context.get('request')
@@ -75,7 +80,10 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('id', 'creator_info', 'caption', 'age_in_seconds', 'like_count', 'urls', 'comments')
+        fields = (
+            'id', 'creator_info', 'caption', 'age_in_seconds',
+            'like_count', 'urls', 'comments', 'liked_by_user'
+        )
 
 
 class Comment(models.Model):
@@ -132,14 +140,26 @@ class PostInteraction(models.Model):
         User, on_delete=models.CASCADE
     )
 
+
+    @classmethod
+    def liked_by_user(self, user_id):
+        likes = PostInteraction.objects.filter(
+            user__pk=user_id,
+            interaction=PostInteractionType.LIKE
+        )
+        return len(likes) > 0
+
     @classmethod
     def create_like(self, post_id, user):
         post_object = Post.objects.get(pk=post_id)
-        like_object = PostInteraction.objects.create(
-            post=post_object,
-            user=user,
-            interaction = PostInteractionType.LIKE
-        )
+        try:
+            like_object = PostInteraction.objects.create(
+                post=post_object,
+                user=user,
+                interaction = PostInteractionType.LIKE
+            )
+        except:
+            return None
         return like_object
 
     class Meta:
