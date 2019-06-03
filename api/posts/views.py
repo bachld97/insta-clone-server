@@ -33,3 +33,11 @@ class PostViewSet(viewsets.ModelViewSet):
             { 'success': 'Like created' },
             status=status.HTTP_201_CREATED
         )
+
+    @action(detail=True, methods=['post'])
+    def unlike(self, request, pk=None):
+        like_object = PostInteraction.delete_like(post_id=pk, user=request.user)
+        return Response(
+            { 'success': 'Like deleted' },
+            status=status.HTTP_202_ACCEPTED
+        )
