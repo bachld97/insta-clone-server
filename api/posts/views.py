@@ -3,7 +3,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .models import Post, PostSerializer, PostInteraction, Comment
+from .serializers import PostSerializer
+from .models.post_comments import Comment
+from .models.post_interactions import PostInteraction
+from .models.posts import Post
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
