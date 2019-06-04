@@ -17,7 +17,7 @@ class PostViewSet(viewsets.ModelViewSet):
         )
         if comment_object is None:
             return Response(
-                { 'error' : 'Cannot comment on this post' },
+                { 'error' : 'Post does not exists.' },
                 status=status.HTTP_400_BAD_REQUEST
             )
         return Response(
@@ -29,8 +29,13 @@ class PostViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def like(self, request, pk=None):
         like_object = PostInteraction.create_like(post_id=pk, user=request.user)
+        if like_object is None:
+            return Response(
+                { 'error': 'Post does not exist or already liked.' },
+                status=status.HTTP_400_BAD_REQUEST
+            )
         return Response(
-            { 'success': 'Like created' },
+            { 'success': 'Like created.' },
             status=status.HTTP_201_CREATED
         )
 
@@ -38,6 +43,6 @@ class PostViewSet(viewsets.ModelViewSet):
     def unlike(self, request, pk=None):
         like_object = PostInteraction.delete_like(post_id=pk, user=request.user)
         return Response(
-            { 'success': 'Like deleted' },
+            { 'success': 'Like deleted.' },
             status=status.HTTP_202_ACCEPTED
         )

@@ -152,7 +152,7 @@ class PostInteraction(models.Model):
     @classmethod
     def delete_like(self, post_id, user):
         like_object = PostInteraction.objects.filter(
-            post_pk=post_id,
+            post_id=post_id,
             user=user
         )
         if like_object is not None:
@@ -161,8 +161,8 @@ class PostInteraction(models.Model):
 
     @classmethod
     def create_like(self, post_id, user):
-        post_object = Post.objects.get(pk=post_id)
         try:
+            post_object = Post.objects.get(pk=post_id)
             like_object = PostInteraction.objects.create(
                 post=post_object,
                 user=user,
