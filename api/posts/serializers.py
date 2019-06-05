@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.urls import reverse
-from .models.posts import Post
+from .models.posts import Post, PostContent
 from .models.post_interactions import PostInteraction
 from .models.post_comments import Comment
 
@@ -14,18 +14,23 @@ class PostSerializer(serializers.ModelSerializer):
     liked_by_user = serializers.SerializerMethodField()
     like_count = serializers.SerializerMethodField()
     comments = serializers.SerializerMethodField()
+    content = serializers.SerializerMethodField()
 
     def create(self, validated_data):
         creator = self.context['request'].user
-        post = Post(
+        images = self.context['request'].FILES.getlist('images[]')
+        post = Post.create_new(
             caption=validated_data['caption'],
+            images=images,
             creator=creator
         )
-        post.save()
         return post
 
     def get_liked_by_user(self, instance):
-        uid = instance.creator.id
+        creator = instance.creator
+        if creator is None:
+            return False
+        uid = creator.id
         return PostInteraction.liked_by_user(user_id=uid)
 
     def get_urls(self, instance):
@@ -44,11 +49,16 @@ class PostSerializer(serializers.ModelSerializer):
         comments = Comment.objects.filter(post__pk=instance.pk)
         return [c.serialized() for c in comments]
 
+    def get_content(self, instance):
+        images = PostContent.objects.filter(post__pk=instance.pk)
+        request = self.context.get('request')
+        return [request.build_absolute_uri(i.image.url) for i in images]
+
     class Meta:
         model = Post
         fields = (
             'id', 'creator_info', 'caption', 'age_in_seconds',
-            'like_count', 'urls', 'comments', 'liked_by_user'
+            'like_count', 'urls', 'comments', 'liked_by_user',
+            'content'
         )
-
 

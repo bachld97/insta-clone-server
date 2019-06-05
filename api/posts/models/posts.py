@@ -15,8 +15,39 @@ class Post(models.Model):
 
     @property
     def creator_info(self):
+        if self.creator is None:
+            return None
+
         return {
             'id': self.creator.id,
             'username': self.creator.username,
         }
 
+
+    @classmethod
+    def create_new(self, caption, images, creator):
+        post = Post(
+            caption=caption,
+            creator=creator
+        )
+        post.save()
+        for image in images:
+            self.__handle_upload__(image=image, post=post)
+        return post
+
+    @classmethod
+    def __handle_upload__(self, image, post):
+        try:
+            PostContent.objects.create(
+                post=post,
+                image=image
+            )
+        except:
+            pass
+
+
+class PostContent(models.Model):
+    post = models.ForeignKey(
+        Post, on_delete=models.CASCADE
+    )
+    image = models.ImageField(upload_to='images/')
