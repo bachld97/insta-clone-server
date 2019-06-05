@@ -1,6 +1,8 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
+from django.contrib.auth.models import User
+
 from . import oauth_client_info
 
 import requests
@@ -10,10 +12,6 @@ from .serializers import CreateUserSerializer
 client_info = oauth_client_info.read_auth_info()
 CLIENT_ID = client_info['client_id']
 CLIENT_SECRET = client_info['client_secret']
-
-# CLIENT_ID = '0kZYFquovqqNPLdMEKuaw4fUnZWkBiXiahSkDEdk'
-# CLIENT_SECRET = 'iFsmJSqLyzbq2Apfh9vNj6m4knvwWnjiqoFEVPmkwMjuwIWjEz2jVZFf2QFipkvrmdYNxuLZJfBjF7liGmpKj30bANMClIBdaH0mvi78rfpPFUnehvFybUHMb7r2EMUA'
-
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -61,8 +59,30 @@ def token(request):
             'client_secret': CLIENT_SECRET,
         },
     )
-    return Response(r.json())
+    
+    response_data = {}
+    token_data = r.json()
+    if 'access_token' in token_data.keys(): # login success
+        response_data = {
+            'token_info': token_data,
+            'user_info': { 'name': request.data['username'] },
+            'user_not_found': False,
+            'wrong_password': False,
+        }
+    else:
+        response_data = _construct_error_response_from_(request)
 
+    return Response(response_data)
+
+
+def _construct_error_response_from_(request):
+    username = request.data['username']
+    user_not_found = User.objects.filter(username=username).first is None
+    wrong_password = not user_not_found
+    return {
+        'user_not_found': user_not_found,
+        'wrong_password': wrong_password
+    }
 
 
 @api_view(['POST'])
