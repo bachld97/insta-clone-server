@@ -1,3 +1,4 @@
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -49,12 +50,21 @@ def token(request):
     Gets tokens with username and password. Input should be in the format:
     {"username": "username", "password": "1234abcd"}
     '''
+    username = request.data.get('username', request.query_params.get('username', None))
+    password = request.data.get('password', request.query_params.get('password', None))
+    
+    if username is None or password is None:
+        return Response(
+            { 'error': 'username or password not found' }, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
     r = requests.post(
     'http://0.0.0.0:8000/o/token/',
         data={
             'grant_type': 'password',
-            'username': request.data['username'],
-            'password': request.data['password'],
+            'username': username,
+            'password': password,
             'client_id': CLIENT_ID,
             'client_secret': CLIENT_SECRET,
         },
@@ -65,18 +75,17 @@ def token(request):
     if 'access_token' in token_data.keys(): # login success
         response_data = {
             'token_info': token_data,
-            'user_info': { 'name': request.data['username'] },
+            'user_info': { 'name': username },
             'user_not_found': False,
             'wrong_password': False,
         }
     else:
-        response_data = _construct_error_response_from_(request)
+        response_data = _construct_error_response_(username=username)
 
     return Response(response_data)
 
 
-def _construct_error_response_from_(request):
-    username = request.data['username']
+def _construct_error_response_(username):
     user_not_found = User.objects.filter(username=username).first is None
     wrong_password = not user_not_found
     return {
