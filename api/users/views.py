@@ -86,8 +86,8 @@ def token(request):
 
 
 def _construct_error_response_(username):
-    user_not_found = User.objects.filter(username=username).first is None
-    wrong_password = not user_not_found
+    wrong_password = User.objects.filter(username=username).exists()
+    user_not_found = not wrong_password
     return {
         'user_not_found': user_not_found,
         'wrong_password': wrong_password
