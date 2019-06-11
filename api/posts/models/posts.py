@@ -20,7 +20,7 @@ class Post(models.Model):
 
         return {
             'id': self.creator.id,
-            'username': self.creator.username,
+            'name': self.creator.username,
         }
 
 

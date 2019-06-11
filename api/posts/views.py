@@ -9,7 +9,9 @@ from .models.post_interactions import PostInteraction
 from .models.posts import Post
 
 class PostViewSet(viewsets.ModelViewSet):
-    queryset = Post.objects.all()
+    queryset = Post.objects.filter(
+        creator__isnull=False
+    )
     serializer_class = PostSerializer
 
     @action(detail=True, methods=['post'])
