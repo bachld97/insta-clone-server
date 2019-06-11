@@ -14,9 +14,21 @@ class PostViewSet(viewsets.ModelViewSet):
     ).select_related('creator')
     serializer_class = PostSerializer
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post', 'get'])
     def comment(self, request, pk=None):
-        content = request.data['content']
+        if (request.method == 'POST'):
+            return self.__new_comment__(request, pk)
+        else:
+            return self.__list_comments__(request, pk)
+    
+    def __new_comment__(self, request, pk=None):
+        content = request.data.get('content', request.query_params.get('content', None))
+        if content is None:
+            return Response(
+                { 'error' : 'Content must be passed in query parameters or in body.' },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         comment_object = Comment.create_for(
             post_id=pk, user=request.user, content=content
         )
@@ -28,6 +40,20 @@ class PostViewSet(viewsets.ModelViewSet):
         return Response(
             comment_object.serialized(),
             status = status.HTTP_201_CREATED
+        )
+
+
+    def __list_comments__(self, request, pk=None):
+        last_comment_id = request.data.get(
+            'lastCommentId', request.query_params.get('lastCommentId', 0)
+        )
+        comments = Comment.objects.filter(
+            pk__gt=last_comment_id,
+            post__pk=pk
+        ).select_related('post', 'creator')
+        data = [comment.serialized() for comment in comments]
+        return Response(
+            data, status=status.HTTP_200_OK
         )
 
 
