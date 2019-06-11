@@ -32,12 +32,13 @@ class PostInteraction(models.Model):
 
 
     @classmethod
-    def liked_by_user(self, user_id):
+    def liked_by_user(self, post, user_id):
         likes = PostInteraction.objects.filter(
+            post__pk=post.pk,
             user__pk=user_id,
             interaction=PostInteractionType.LIKE
-        )
-        return len(likes) > 0
+        ).select_related('user', 'post')
+        return likes.exists()
 
     @classmethod
     def delete_like(self, post_id, user):

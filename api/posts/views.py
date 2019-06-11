@@ -11,7 +11,7 @@ from .models.posts import Post
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.filter(
         creator__isnull=False
-    )
+    ).select_related('creator')
     serializer_class = PostSerializer
 
     @action(detail=True, methods=['post'])

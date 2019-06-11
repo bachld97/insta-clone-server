@@ -31,7 +31,7 @@ class PostSerializer(serializers.ModelSerializer):
         if creator is None:
             return False
         uid = creator.id
-        return PostInteraction.liked_by_user(user_id=uid)
+        return PostInteraction.liked_by_user(post=instance, user_id=uid)
 
     def get_urls(self, instance):
         request = self.context.get('request')
@@ -46,11 +46,11 @@ class PostSerializer(serializers.ModelSerializer):
         return PostInteraction.like_count(post_id=instance.pk)
 
     def get_comments(self, instance):
-        comments = Comment.objects.filter(post__pk=instance.pk)
+        comments = Comment.objects.filter(post__pk=instance.pk).select_related('post')
         return [c.serialized() for c in comments]
 
     def get_content(self, instance):
-        images = PostContent.objects.filter(post__pk=instance.pk)
+        images = PostContent.objects.filter(post__pk=instance.pk).select_related('post')
         request = self.context.get('request')
         return [request.build_absolute_uri(i.image.url) for i in images]
 
