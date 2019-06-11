@@ -36,18 +36,18 @@ class PostViewSet(viewsets.ModelViewSet):
         like_object = PostInteraction.create_like(post_id=pk, user=request.user)
         if like_object is None:
             return Response(
-                { 'error': 'Post does not exist or already liked.' },
+                { 'success': False, 'error': 'Post does not exist or already liked.' },
                 status=status.HTTP_400_BAD_REQUEST
             )
         return Response(
-            { 'success': 'Like created.' },
+            { 'success': True },
             status=status.HTTP_201_CREATED
         )
 
     @action(detail=True, methods=['post'])
     def unlike(self, request, pk=None):
-        like_object = PostInteraction.delete_like(post_id=pk, user=request.user)
+        like_object = PostInteraction.delete_like(post_id=pk, user_id=request.user.id)
         return Response(
-            { 'success': 'Like deleted.' },
+            { 'success': 'True' },
             status=status.HTTP_202_ACCEPTED
         )

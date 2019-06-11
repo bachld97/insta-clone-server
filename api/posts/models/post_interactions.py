@@ -30,7 +30,6 @@ class PostInteraction(models.Model):
         User, on_delete=models.CASCADE
     )
 
-
     @classmethod
     def liked_by_user(self, post, user_id):
         likes = PostInteraction.objects.filter(
@@ -40,14 +39,16 @@ class PostInteraction(models.Model):
         ).select_related('user', 'post')
         return likes.exists()
 
+
     @classmethod
-    def delete_like(self, post_id, user):
-        like_object = PostInteraction.objects.filter(
-            post_id=post_id,
-            user=user
-        )
-        if like_object is not None:
-            like_object.delete()
+    def delete_like(self, post_id, user_id):
+        likes = PostInteraction.objects.filter(
+            post__pk=post_id,
+            user__pk=user_id,
+            interaction=PostInteractionType.LIKE
+        ).select_related('post', 'user')
+        for like in likes:
+            like.delete()
 
 
     @classmethod
@@ -59,9 +60,11 @@ class PostInteraction(models.Model):
                 user=user,
                 interaction = PostInteractionType.LIKE
             )
-        except:
+        except Exception as error:
+            print(error)
             return None
         return like_object
+
 
     @classmethod
     def like_count(self, post_id):
@@ -71,6 +74,6 @@ class PostInteraction(models.Model):
         return count
 
     class Meta:
-        unique_together = (('interaction', 'user'))
+        unique_together = (('post', 'interaction', 'user'))
 
 
