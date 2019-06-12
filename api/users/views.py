@@ -73,9 +73,11 @@ def token(request):
     response_data = {}
     token_data = r.json()
     if 'access_token' in token_data.keys(): # login success
+        # Find userid with username
+        uid = User.objects.get(username=username).id
         response_data = {
             'token_info': token_data,
-            'user_info': { 'name': username },
+            'user_info': { 'name': username, 'id': uid },
             'user_not_found': False,
             'wrong_password': False,
         }

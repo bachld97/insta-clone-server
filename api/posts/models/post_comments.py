@@ -22,7 +22,7 @@ class Comment(models.Model):
     def creator_info(self):
         return {
             'id': self.creator.id,
-            'username': self.creator.username,
+            'name': self.creator.username,
         }
 
     @classmethod
